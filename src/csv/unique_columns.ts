@@ -7,7 +7,7 @@ export async function getUniqueColumns(inputFiles: string[]): Promise<string[]> 
 
     for (const inputFile of inputFiles) {
         const headerString: string = await firstLine(inputFile);
-        const header = await getColumnHeaders(headerString);
+        const header = await getColumnHeaders(inputFile, headerString);
 
         header.forEach((column) => {
             uniqueColumnsSet.add(column);
@@ -19,7 +19,7 @@ export async function getUniqueColumns(inputFiles: string[]): Promise<string[]> 
     return uniqueColumns;
 }
 
-function getColumnHeaders(headerString: string): Promise<string[]> {
+function getColumnHeaders(inputFile: string, headerString: string): Promise<string[]> {
     return new Promise((resolve, reject) => {
         csvParse(headerString, (error, result) => {
             if (error) {
@@ -27,7 +27,7 @@ function getColumnHeaders(headerString: string): Promise<string[]> {
             }
 
             if (!Array.isArray(result) || result.length < 1) {
-                return reject('invalid csv header');
+                return reject(`invalid csv header ${inputFile}`);
             }
 
             resolve(result[0]);
